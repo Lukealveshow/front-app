@@ -4,7 +4,8 @@ import 'registry.dart';
 import 'home_screen.dart';
 import 'storage_service.dart';
 import 'services/config_service.dart';
-void main() async{
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ConfigService.load();
   runApp(const MyApp());
@@ -18,8 +19,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'MAKENLP',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: const Color(0xFF010A13),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent),
       ),
       home: const LoginScreen(),
     );
@@ -35,80 +37,142 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _loginController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _loginController.clear();
-    _emailController.clear();
-    _passwordController.clear();
-  }
-
-  void _login() async{
+  void _login() async {
     String login = _loginController.text;
-    String email = _emailController.text;
     String password = _passwordController.text;
-    final result = await ApiService.login(login, email, password);
+    final result = await ApiService.login(login, '', password);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(result['message'] ?? 'Erro')),
     );
     if (result['status'] == 'success') {
       await saveToken(result['token']);
-
-      Navigator.pushReplacement(context,
-      MaterialPageRoute(builder: (context)=>const HomePage()),
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
-  }
-
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('MAKENLP Login'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 16),
-            TextField(
-              controller: _loginController,
-              decoration: const InputDecoration(
-                labelText: 'Login',
-                border: OutlineInputBorder(),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF010A13),
+              Color(0xFF021B2E),
+              Color(0xFF041F3F),
+            ],
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo LOGIN
+                  Image.asset(
+                    'assets/login.png',
+                    height: 150,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: 48),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.40,
+                    child: TextField(
+                      controller: _loginController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'Login',
+                        labelStyle: const TextStyle(color: Colors.cyanAccent),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: Colors.cyanAccent),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: Colors.cyanAccent, width: 2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.black.withOpacity(0.25),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.40,
+                    child: TextField(
+                      controller: _passwordController,
+                      style: const TextStyle(color: Colors.white),
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: const TextStyle(color: Colors.cyanAccent),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: Colors.cyanAccent),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(color: Colors.cyanAccent, width: 2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.black.withOpacity(0.25),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.40,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.cyanAccent.withOpacity(0.1),
+                        foregroundColor: Colors.cyanAccent,
+                        side: const BorderSide(color: Colors.cyanAccent),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: _login,
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const RegistryScreen()),
+                      );
+                    },
+                    child: const Text(
+                      'Criar conta',
+                      style: TextStyle(color: Colors.cyanAccent),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _login,
-              child: const Text('Login'),
-            ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const RegistryScreen()),
-                  );
-              },
-              child: const Text('Criar conta'),
-            ),
-          ],
+          ),
         ),
       ),
     );

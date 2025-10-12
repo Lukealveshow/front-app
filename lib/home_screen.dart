@@ -21,13 +21,13 @@ class _HomePageState extends State<HomePage> {
   String translated = "";
   String language = "pt-BR";
   String uiLanguage = "pt";
-
   String appTheme = "White";
 
+  // === Cores dinâmicas ===
   Color get backgroundColor {
     switch (appTheme) {
       case "Dark":
-        return Colors.grey.shade900;
+        return Colors.transparent;
       case "Light":
         return Colors.purple.shade50;
       case "White":
@@ -39,12 +39,39 @@ class _HomePageState extends State<HomePage> {
   Color get textColor {
     switch (appTheme) {
       case "Dark":
-        return Colors.white;
+        return Colors.cyanAccent;
       default:
         return Colors.black87;
     }
   }
 
+  Color get fieldFillColor {
+    switch (appTheme) {
+      case "Dark":
+        return Colors.black.withOpacity(0.25);
+      default:
+        return Colors.white;
+    }
+  }
+
+  InputDecoration _buildInputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: textColor),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: textColor),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: textColor, width: 2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      filled: true,
+      fillColor: fieldFillColor,
+    );
+  }
+
+  // === Traduções ===
   final Map<String, Map<String, String>> translations = {
     "pt": {
       "title": "Bem Vindo ao MAKENLP",
@@ -57,6 +84,7 @@ class _HomePageState extends State<HomePage> {
       "summary": "Resumo",
       "answer": "Resposta",
       "translated": "Tradução",
+      "clean": "Limpar",
     },
     "en": {
       "title": "Welcome to MAKENLP",
@@ -69,6 +97,7 @@ class _HomePageState extends State<HomePage> {
       "summary": "Summary",
       "answer": "Answer",
       "translated": "Translation",
+      "clean": "Clean",
     },
     "es": {
       "title": "Bienvenido a MAKENLP",
@@ -81,6 +110,7 @@ class _HomePageState extends State<HomePage> {
       "summary": "Resumen",
       "answer": "Respuesta",
       "translated": "Traducción",
+      "clean": "Limpiar",
     },
     "fr": {
       "title": "Bienvenue à MAKENLP",
@@ -93,338 +123,453 @@ class _HomePageState extends State<HomePage> {
       "summary": "Résumé",
       "answer": "Réponse",
       "translated": "Traduction",
+      "clean": "Effacer"
     },
   };
 
+  // === Idiomas com Português como primeira opção ===
+  final List<Map<String, String>> languagesList = [
+    {"code": "pt-BR", "name": "Português"},
+    {"code": "en", "name": "Inglês"},
+    {"code": "es", "name": "Espanhol"},
+    {"code": "fr", "name": "Francês"},
+  ];
+
   final Map<String, Map<String, String>> languageNames = {
-    "pt": {"en": "Inglês", "es": "Espanhol", "fr": "Francês", "pt-BR": "Português"},
-    "en": {"en": "English", "es": "Spanish", "fr": "French", "pt-BR": "Portuguese"},
-    "es": {"en": "Inglés", "es": "Español", "fr": "Francés", "pt-BR": "Portugués"},
-    "fr": {"en": "Anglais", "es": "Espagnol", "fr": "Français", "pt-BR": "Portugais"},
-  };
+  "pt": {
+    "pt-BR": "Português",
+    "en": "Inglês",
+    "es": "Espanhol",
+    "fr": "Francês",
+  },
+  "en": {
+    "pt-BR": "Portuguese",
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+  },
+  "es": {
+    "pt-BR": "Portugués",
+    "en": "Inglés",
+    "es": "Español",
+    "fr": "Francés",
+  },
+  "fr": {
+    "pt-BR": "Portugais",
+    "en": "Anglais",
+    "es": "Espagnol",
+    "fr": "Français",
+  },
+};
+
+
+  // === Função para centralizar e padronizar largura de campos e outputs ===
+  Widget _buildFieldContainer(Widget child, {required double width}) {
+    return Center(
+      child: SizedBox(
+        width: width,
+        child: child,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final t = translations[uiLanguage]!;
-    final langNames = languageNames[uiLanguage]!;
+
+    final double fieldWidth = MediaQuery.of(context).size.width * 0.60;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(140),
-        child: Container(
-          color: backgroundColor,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: SafeArea(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                IconButton(
-                  tooltip: "Sair",
-                  icon: Image.asset(
-                    'assets/signout.png',
-                    width: 32,
-                    height: 32,
-                    color: textColor, 
-                  ),
-                  onPressed: () async {
-                    await clearToken();
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const LoginScreen()),
-                      (route) => false,
-                    );
-                  },
-                ),
-
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/makenlp.png', height: 100),
-                    const SizedBox(height: 6),
-                    Text(
-                      t["title"]!,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
-                      ),
-                    ),
+      body: Container(
+        decoration: appTheme == "Dark"
+            ? const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF010A13),
+                    Color(0xFF021B2E),
+                    Color(0xFF041F3F),
                   ],
                 ),
-
-                Row(
+              )
+            : BoxDecoration(color: backgroundColor),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              height: 140,
+              color: Colors.transparent,
+              child: SafeArea(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     IconButton(
-                      tooltip: "Tema",
-                      icon: const Icon(Icons.color_lens, size: 32),
-                      color: textColor,
-                      onPressed: () {
-                        showMenu(
-                          context: context,
-                          position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
-                          items: [
-                            PopupMenuItem(
-                              onTap: () => setState(() => appTheme = "White"),
-                              child: const Text("White"),
-                            ),
-                            PopupMenuItem(
-                              onTap: () => setState(() => appTheme = "Dark"),
-                              child: const Text("Dark"),
-                            ),
-                            PopupMenuItem(
-                              onTap: () => setState(() => appTheme = "Light"),
-                              child: const Text("Light"),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-
-                    IconButton(
-                      tooltip: "Idioma",
+                      tooltip: "Sair",
                       icon: Image.asset(
-                        'assets/translate.png',
+                        'assets/signout.png',
                         width: 32,
                         height: 32,
-                        color: textColor, 
+                        color: textColor,
                       ),
-                      onPressed: () {
-                        showMenu(
-                          context: context,
-                          position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
-                          items: [
-                            PopupMenuItem(onTap: () => setState(() => uiLanguage = "pt"), child: const Text("Português")),
-                            PopupMenuItem(onTap: () => setState(() => uiLanguage = "en"), child: const Text("English")),
-                            PopupMenuItem(onTap: () => setState(() => uiLanguage = "es"), child: const Text("Español")),
-                            PopupMenuItem(onTap: () => setState(() => uiLanguage = "fr"), child: const Text("Français")),
-                          ],
+                      onPressed: () async {
+                        await clearToken();
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => const LoginScreen()),
+                          (route) => false,
                         );
                       },
                     ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset('assets/makenlp.png', height: 100),
+                        const SizedBox(height: 6),
+                        Text(
+                          t["title"]!,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          tooltip: "Tema",
+                          icon: const Icon(Icons.color_lens, size: 32),
+                          color: textColor,
+                          onPressed: () {
+                            showMenu(
+                              context: context,
+                              position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
+                              items: [
+                                PopupMenuItem(
+                                    onTap: () => setState(() => appTheme = "White"),
+                                    child: const Text("White")),
+                                PopupMenuItem(
+                                    onTap: () => setState(() => appTheme = "Dark"),
+                                    child: const Text("Dark")),
+                                PopupMenuItem(
+                                    onTap: () => setState(() => appTheme = "Light"),
+                                    child: const Text("Light")),
+                              ],
+                            );
+                          },
+                        ),
+                        IconButton(
+                          tooltip: "Idioma",
+                          icon: Image.asset(
+                            'assets/translate.png',
+                            width: 32,
+                            height: 32,
+                            color: textColor,
+                          ),
+                          onPressed: () {
+                            showMenu(
+                              context: context,
+                              position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
+                              items: [
+                                PopupMenuItem(
+                                    onTap: () => setState(() => uiLanguage = "pt"),
+                                    child: const Text("Português")),
+                                PopupMenuItem(
+                                    onTap: () => setState(() => uiLanguage = "en"),
+                                    child: const Text("English")),
+                                PopupMenuItem(
+                                    onTap: () => setState(() => uiLanguage = "es"),
+                                    child: const Text("Español")),
+                                PopupMenuItem(
+                                    onTap: () => setState(() => uiLanguage = "fr"),
+                                    child: const Text("Français")),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 50),
-            Padding(
-            padding: const EdgeInsets.only(left: 160), 
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.60,
-                  child: TextField(
-                    controller: textController,
-                    style: TextStyle(color: textColor), 
-                    decoration: InputDecoration(
-                      labelText: t["summarize"],
-                      labelStyle: TextStyle(color: textColor),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
+                    _buildFieldContainer(
+                      _buildFieldWithButton(
+                        textController,
+                        t["summarize"]!,
+                        () async {
+                          final result =
+                              await ApiService.summarize(textController.text);
+                          setState(() => summary = result["summary"] ?? "");
+                        },
+                      ),
+                      width: fieldWidth,
                     ),
-                    maxLines: null,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    final result = await ApiService.summarize(textController.text);
-                    setState(() => summary = result["summary"] ?? "");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: textColor, 
-                    backgroundColor: appTheme == "Dark" ? Colors.grey.shade800 : null,
-                  ),
-                  child: Text(t["send"]!),
-                ),
-              ],
-            ),
-            ),
-            const SizedBox(height: 24),
-            Padding(
-            padding: const EdgeInsets.only(left: 160),
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.60,
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(
-                "${t["summary"]}: $summary",
-                style: TextStyle(color: textColor),
-              ),
-            ),
-          ),
-            const SizedBox(height: 50),
-            Padding(
-            padding: const EdgeInsets.only(left: 160),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.60,
-              child: TextField(
-                controller: contextController,
-                style: TextStyle(color: textColor),
-                decoration: InputDecoration(
-                  labelText: t["context"],
-                  labelStyle: TextStyle(color: textColor),
-                ),
-                maxLines: null,
-              ),
-            ),
-          ),
-            const SizedBox(height: 16),
-            Padding(
-            padding: const EdgeInsets.only(left: 160),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.45,
-                  child: TextField(
-                    controller: questionController,
-                    style: TextStyle(color: textColor),
-                    decoration: InputDecoration(
-                      labelText: t["question"],
-                      labelStyle: TextStyle(color: textColor),
+                    const SizedBox(height: 16),
+                    _buildFieldContainer(
+                      _buildOutputContainer("${t["summary"]}: $summary"),
+                      width: fieldWidth,
                     ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    final result = await ApiService.answer(contextController.text, questionController.text);
-                    setState(() => answer = result["answer"] ?? "");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: textColor,
-                    backgroundColor: appTheme == "Dark" ? Colors.grey.shade800 : null,
-                  ),
-                  child: Text(t["send"]!),
-                ),
-              ],
-            ),
-          ),
-            const SizedBox(height: 24),
-            Padding(
-            padding: const EdgeInsets.only(left: 160),
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.60,
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(
-                "${t["answer"]}: $answer",
-                style: TextStyle(color: textColor),
-              ),
-            ),
-          ),
-
-            const SizedBox(height: 50),
-            Padding(
-            padding: const EdgeInsets.only(left: 160),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.60,
-                  child: TextField(
-                    controller: translateController,
-                    style: TextStyle(color: textColor),
-                    decoration: InputDecoration(
-                      labelText: t["translate"],
-                      labelStyle: TextStyle(color: textColor),
+                    const SizedBox(height: 24),
+                    _buildFieldContainer(
+                      _buildSingleField(contextController, t["context"]!),
+                      width: fieldWidth,
                     ),
-                    maxLines: null,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    final result = await ApiService.translate(translateController.text, language);
-                    setState(() => translated = result["translated"] ?? "");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: textColor,
-                    backgroundColor: appTheme == "Dark" ? Colors.grey.shade800 : null,
-                  ),
-                  child: Text(t["send"]!),
-                ),
-              ],
-            ),
-            ),
-            const SizedBox(height: 16),
-            Padding(
-            padding: const EdgeInsets.only(left: 160),
-            child: DropdownButton<String>(
-              value: language,
-              dropdownColor: backgroundColor,
-              style: TextStyle(color: textColor),
-              items: langNames.entries.map((entry) {
-                return DropdownMenuItem(value: entry.key, child: Text(entry.value, style: TextStyle(color: textColor)));
-              }).toList(),
-              onChanged: (value) => setState(() => language = value!),
-            ),
-          ),
-            const SizedBox(height: 24),
-            Padding(
-            padding: const EdgeInsets.only(left: 160),
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.60,
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(
-                "${t["translated"]}: $translated",
-                style: TextStyle(color: textColor),
-              ),
-            ),
-          ),
+                    const SizedBox(height: 16),
+                    _buildFieldContainer(
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildSingleField(questionController, t["question"]!),
+                          ),
+                          const SizedBox(width: 16),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final result = await ApiService.answer(
+                                contextController.text,
+                                questionController.text,
+                              );
+                              setState(() => answer = result["answer"] ?? "");
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: textColor,
+                              backgroundColor: appTheme == "Dark"
+                                  ? Colors.grey.shade800
+                                  : Colors.blueAccent,
+                            ),
+                            child: Text(translations[uiLanguage]!["send"]!),
+                          ),
+                        ],
+                      ),
+                      width: fieldWidth,
+                    ),
+                    const SizedBox(height: 16),
 
-            const SizedBox(height: 50),
+                    _buildFieldContainer(
+                      _buildOutputContainer("${t["answer"]}: $answer"),
+                      width: fieldWidth,
+                    ),
+                    const SizedBox(height: 24),
 
-            Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  final token = await getSavedToken();
-                  final result = await ApiService.saveData(
-                    textController.text,
-                    contextController.text,
-                    questionController.text,
-                    translateController.text,
-                    language,
-                    summary,
-                    answer,
-                    translated,
-                    token,
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(result["message"] ?? "Erro ao salvar")),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: textColor,
-                  backgroundColor: appTheme == "Dark" ? Colors.grey.shade800 : null,
+                    _buildFieldContainer(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildSingleField(translateController, t["translate"]!),
+                              ),
+                              const SizedBox(width: 16),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.08,
+                                child: DropdownButton<String>(
+                                  value: language,
+                                  isExpanded: true,
+                                  alignment: AlignmentDirectional.centerStart,
+                                  dropdownColor: backgroundColor,
+                                  style: TextStyle(color: textColor),
+                                  items: languagesList.map((lang) {
+                                    return DropdownMenuItem(
+                                      value: lang["code"],
+                                      child: Text(
+                                        languageNames[uiLanguage]![lang["code"]]!, // <-- usa o uiLanguage
+                                        style: TextStyle(color: textColor),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() => language = value!);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                final result = await ApiService.translate(
+                                  translateController.text,
+                                  language,
+                                );
+                                setState(() => translated = result["translated"] ?? "");
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: textColor,
+                                backgroundColor: appTheme == "Dark"
+                                    ? Colors.grey.shade800
+                                    : Colors.blueAccent,
+                              ),
+                              child: Text(translations[uiLanguage]!["send"]!),
+                            ),
+                          ),
+                        ],
+                      ),
+                      width: fieldWidth,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Tradução final
+                    _buildFieldContainer(
+                      _buildOutputContainer("${t["translated"]}: $translated"),
+                      width: fieldWidth,
+                    ),
+                    const SizedBox(height: 40),
+
+                    // Botões Enviar Tudo e Limpar
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              final token = await getSavedToken();
+                              final result = await ApiService.saveData(
+                                textController.text,
+                                contextController.text,
+                                questionController.text,
+                                translateController.text,
+                                language,
+                                summary,
+                                answer,
+                                translated,
+                                token,
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(result["message"] ?? "Erro ao salvar")),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: textColor,
+                              backgroundColor: appTheme == "Dark"
+                                  ? Colors.grey.shade800
+                                  : Colors.cyanAccent.withOpacity(0.1),
+                              side: BorderSide(color: textColor),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 32),
+                            ),
+                            child: Text(
+                              t["sendAll"]!,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                // Limpa todos os campos de texto
+                                textController.clear();
+                                contextController.clear();
+                                questionController.clear();
+                                translateController.clear();
+                                // Reseta o dropdown de idioma
+                                language = "pt-BR";
+                                // Reseta outputs
+                                summary = "";
+                                answer = "";
+                                translated = "";
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: textColor,
+                              backgroundColor: appTheme == "Dark"
+                                  ? Colors.grey.shade800
+                                  : Colors.cyanAccent.withOpacity(0.1),
+                              side: BorderSide(color: textColor),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 32),
+                            ),
+                            child: Text(
+                              t["clean"]!,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 50),
+                  ],
                 ),
-                child: Text(t["sendAll"]!),
               ),
             ),
-
-            const SizedBox(height: 50),
           ],
         ),
       ),
+    );
+  }
+
+  // === Widgets auxiliares ===
+  Widget _buildFieldWithButton(
+      TextEditingController controller, String label, VoidCallback onPressed) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            style: TextStyle(color: textColor),
+            decoration: _buildInputDecoration(label),
+            maxLines: null,
+          ),
+        ),
+        const SizedBox(width: 16),
+        ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            foregroundColor: textColor,
+            backgroundColor:
+                appTheme == "Dark" ? Colors.grey.shade800 : Colors.blueAccent,
+          ),
+          child: Text(translations[uiLanguage]!["send"]!),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSingleField(TextEditingController controller, String label) {
+    return TextField(
+      controller: controller,
+      style: TextStyle(color: textColor),
+      decoration: _buildInputDecoration(label),
+      maxLines: null,
+    );
+  }
+
+  Widget _buildOutputContainer(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: textColor),
+        borderRadius: BorderRadius.circular(5),
+        color: fieldFillColor,
+      ),
+      child: Text(text, style: TextStyle(color: textColor)),
     );
   }
 }
