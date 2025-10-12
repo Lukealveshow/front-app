@@ -48,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
     if (result['status'] == 'success') {
       await saveToken(result['token']);
+      await saveUserLogin(result['login']);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),
@@ -175,6 +176,23 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
-  }
-}
+      bottomNavigationBar: Container(
+        height: 80,
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Colors.cyanAccent, width: 0.3),
+          ),
+        ),
+        alignment: Alignment.center,
+        child: const Text(
+          "© 2025 MAKENLP - Todos os direitos reservados a Lucas Alves Martins",
+          style: TextStyle(
+            color: Colors.cyanAccent,
+            fontSize: 15,
+            letterSpacing: 1.1,
+          ),
+        ),
+      ),
+          );
+      }
+      }

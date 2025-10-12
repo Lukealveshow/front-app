@@ -23,6 +23,9 @@ class _HomePageState extends State<HomePage> {
   String uiLanguage = "pt";
   String appTheme = "White";
 
+  String loggedUser = "";
+  bool apiOnline = false;
+
   Color get backgroundColor {
     switch (appTheme) {
       case "Dark":
@@ -51,6 +54,21 @@ class _HomePageState extends State<HomePage> {
       default:
         return Colors.white;
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFooterInfo();
+  }
+
+  Future<void> _loadFooterInfo() async {
+    String? user = await getUserLogin();
+    bool status = await ApiService.checkStatus();
+    setState(() {
+      loggedUser = user ?? "";
+      apiOnline = status;
+    });
   }
 
   InputDecoration _buildInputDecoration(String label) {
@@ -190,6 +208,7 @@ class _HomePageState extends State<HomePage> {
             : BoxDecoration(color: backgroundColor),
         child: Column(
           children: [
+            // HEADER
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               height: 140,
@@ -199,28 +218,24 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: IconButton(
-                        tooltip: "Sair",
-                        icon: Image.asset(
-                          'assets/signout.png',
-                          width: 32,
-                          height: 32,
-                          color: textColor,
-                        ),
-                        onPressed: () async {
-                          await clearToken();
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginScreen()),
-                            (route) => false,
-                          );
-                        },
+                    IconButton(
+                      tooltip: "Sair",
+                      icon: Image.asset(
+                        'assets/signout.png',
+                        width: 32,
+                        height: 32,
+                        color: textColor,
                       ),
+                      onPressed: () async {
+                        await clearToken();
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginScreen()),
+                          (route) => false,
+                        );
+                      },
                     ),
-
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -236,10 +251,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         IconButton(
                           tooltip: "Tema",
@@ -308,6 +320,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
+            // BODY
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
@@ -315,44 +328,36 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 20),
-
                     _buildFieldContainer(
                       _buildFieldWithButton(
-                        textController,
-                        t["summarize"]!,
-                        () async {
-                          final result =
-                              await ApiService.summarize(textController.text);
-                          setState(() => summary = result["summary"] ?? "");
-                        },
-                      ),
+                          textController, t["summarize"]!, () async {
+                        final result =
+                            await ApiService.summarize(textController.text);
+                        setState(() => summary = result["summary"] ?? "");
+                      }),
                       width: fieldWidth,
                     ),
                     const SizedBox(height: 16),
                     _buildFieldContainer(
-                      _buildOutputContainer("${t["summary"]}: $summary"),
-                      width: fieldWidth,
-                    ),
+                        _buildOutputContainer("${t["summary"]}: $summary"),
+                        width: fieldWidth),
                     const SizedBox(height: 24),
                     _buildFieldContainer(
-                      _buildSingleField(contextController, t["context"]!),
-                      width: fieldWidth,
-                    ),
+                        _buildSingleField(contextController, t["context"]!),
+                        width: fieldWidth),
                     const SizedBox(height: 16),
                     _buildFieldContainer(
                       Row(
                         children: [
                           Expanded(
-                            child:
-                                _buildSingleField(questionController, t["question"]!),
-                          ),
+                              child: _buildSingleField(
+                                  questionController, t["question"]!)),
                           const SizedBox(width: 16),
                           ElevatedButton(
                             onPressed: () async {
                               final result = await ApiService.answer(
-                                contextController.text,
-                                questionController.text,
-                              );
+                                  contextController.text,
+                                  questionController.text);
                               setState(() => answer = result["answer"] ?? "");
                             },
                             style: ElevatedButton.styleFrom(
@@ -369,23 +374,21 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 16),
                     _buildFieldContainer(
-                      _buildOutputContainer("${t["answer"]}: $answer"),
-                      width: fieldWidth,
-                    ),
+                        _buildOutputContainer("${t["answer"]}: $answer"),
+                        width: fieldWidth),
                     const SizedBox(height: 24),
                     _buildFieldContainer(
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Row(
                             children: [
                               Expanded(
-                                child:
-                                    _buildSingleField(translateController, t["translate"]!),
-                              ),
+                                  child: _buildSingleField(
+                                      translateController, t["translate"]!)),
                               const SizedBox(width: 16),
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.08,
+                                width:
+                                    MediaQuery.of(context).size.width * 0.08,
                                 child: DropdownButton<String>(
                                   value: language,
                                   isExpanded: true,
@@ -396,7 +399,8 @@ class _HomePageState extends State<HomePage> {
                                     return DropdownMenuItem(
                                       value: lang["code"],
                                       child: Text(
-                                        languageNames[uiLanguage]![lang["code"]]!,
+                                        languageNames[uiLanguage]![
+                                            lang["code"]]!,
                                         style: TextStyle(color: textColor),
                                       ),
                                     );
@@ -413,10 +417,9 @@ class _HomePageState extends State<HomePage> {
                             child: ElevatedButton(
                               onPressed: () async {
                                 final result = await ApiService.translate(
-                                  translateController.text,
-                                  language,
-                                );
-                                setState(() => translated = result["translated"] ?? "");
+                                    translateController.text, language);
+                                setState(
+                                    () => translated = result["translated"] ?? "");
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: textColor,
@@ -433,11 +436,11 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 16),
                     _buildFieldContainer(
-                      _buildOutputContainer("${t["translated"]}: $translated"),
-                      width: fieldWidth,
-                    ),
+                        _buildOutputContainer("${t["translated"]}: $translated"),
+                        width: fieldWidth),
                     const SizedBox(height: 40),
 
+                    // BOTÕES SALVAR/LIMPAR
                     Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -457,7 +460,9 @@ class _HomePageState extends State<HomePage> {
                                 token,
                               );
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(result["message"] ?? "Erro ao salvar")),
+                                SnackBar(
+                                    content:
+                                        Text(result["message"] ?? "Erro ao salvar")),
                               );
                             },
                             style: ElevatedButton.styleFrom(
@@ -467,17 +472,14 @@ class _HomePageState extends State<HomePage> {
                                   : Colors.cyanAccent.withOpacity(0.1),
                               side: BorderSide(color: textColor),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                                  borderRadius: BorderRadius.circular(20)),
                               padding: const EdgeInsets.symmetric(
                                   vertical: 16, horizontal: 32),
                             ),
                             child: Text(
                               t["sendAll"]!,
                               style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                              ),
+                                  fontWeight: FontWeight.bold, letterSpacing: 1.2),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -501,17 +503,14 @@ class _HomePageState extends State<HomePage> {
                                   : Colors.cyanAccent.withOpacity(0.1),
                               side: BorderSide(color: textColor),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                                  borderRadius: BorderRadius.circular(20)),
                               padding: const EdgeInsets.symmetric(
                                   vertical: 16, horizontal: 32),
                             ),
                             child: Text(
                               t["clean"]!,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                              ),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, letterSpacing: 1.2),
                             ),
                           ),
                         ],
@@ -519,6 +518,22 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 50),
                   ],
+                ),
+              ),
+            ),
+
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              color: appTheme == "Dark" ? Colors.black54 : Colors.blue.shade50,
+              child: Center(
+                child: Text(
+                  "🏠 HomeScreen  👤 Usuário: $loggedUser     🔌 API: ${apiOnline ? "Online" : "Offline"}     ⚙️ Backend: v1.0.0",
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
@@ -531,8 +546,6 @@ class _HomePageState extends State<HomePage> {
   Widget _buildFieldWithButton(
       TextEditingController controller, String label, VoidCallback onPressed) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: TextField(

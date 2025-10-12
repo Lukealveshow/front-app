@@ -96,4 +96,17 @@ class ApiService {
     );
     return jsonDecode(response.body);
   }
+
+  static Future<bool> checkStatus() async {
+  try {
+    final response = await http.get(Uri.parse("$baseUrl/status"));
+    if (response.statusCode == 200) {
+      return true;
+    }
+  } catch (e) {
+    print("Erro ao conectar com API: $e");
+  }
+  return false;
+}
+
 }
