@@ -23,7 +23,6 @@ class _HomePageState extends State<HomePage> {
   String uiLanguage = "pt";
   String appTheme = "White";
 
-  // === Cores dinâmicas ===
   Color get backgroundColor {
     switch (appTheme) {
       case "Dark":
@@ -71,7 +70,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // === Traduções ===
   final Map<String, Map<String, String>> translations = {
     "pt": {
       "title": "Bem Vindo ao MAKENLP",
@@ -127,7 +125,6 @@ class _HomePageState extends State<HomePage> {
     },
   };
 
-  // === Idiomas com Português como primeira opção ===
   final List<Map<String, String>> languagesList = [
     {"code": "pt-BR", "name": "Português"},
     {"code": "en", "name": "Inglês"},
@@ -136,34 +133,32 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final Map<String, Map<String, String>> languageNames = {
-  "pt": {
-    "pt-BR": "Português",
-    "en": "Inglês",
-    "es": "Espanhol",
-    "fr": "Francês",
-  },
-  "en": {
-    "pt-BR": "Portuguese",
-    "en": "English",
-    "es": "Spanish",
-    "fr": "French",
-  },
-  "es": {
-    "pt-BR": "Portugués",
-    "en": "Inglés",
-    "es": "Español",
-    "fr": "Francés",
-  },
-  "fr": {
-    "pt-BR": "Portugais",
-    "en": "Anglais",
-    "es": "Espagnol",
-    "fr": "Français",
-  },
-};
+    "pt": {
+      "pt-BR": "Português",
+      "en": "Inglês",
+      "es": "Espanhol",
+      "fr": "Francês",
+    },
+    "en": {
+      "pt-BR": "Portuguese",
+      "en": "English",
+      "es": "Spanish",
+      "fr": "French",
+    },
+    "es": {
+      "pt-BR": "Portugués",
+      "en": "Inglés",
+      "es": "Español",
+      "fr": "Francés",
+    },
+    "fr": {
+      "pt-BR": "Portugais",
+      "en": "Anglais",
+      "es": "Espagnol",
+      "fr": "Français",
+    },
+  };
 
-
-  // === Função para centralizar e padronizar largura de campos e outputs ===
   Widget _buildFieldContainer(Widget child, {required double width}) {
     return Center(
       child: SizedBox(
@@ -176,7 +171,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final t = translations[uiLanguage]!;
-
     final double fieldWidth = MediaQuery.of(context).size.width * 0.60;
 
     return Scaffold(
@@ -205,23 +199,28 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    IconButton(
-                      tooltip: "Sair",
-                      icon: Image.asset(
-                        'assets/signout.png',
-                        width: 32,
-                        height: 32,
-                        color: textColor,
+                    Align(
+                      alignment: Alignment.center,
+                      child: IconButton(
+                        tooltip: "Sair",
+                        icon: Image.asset(
+                          'assets/signout.png',
+                          width: 32,
+                          height: 32,
+                          color: textColor,
+                        ),
+                        onPressed: () async {
+                          await clearToken();
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginScreen()),
+                            (route) => false,
+                          );
+                        },
                       ),
-                      onPressed: () async {
-                        await clearToken();
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => const LoginScreen()),
-                          (route) => false,
-                        );
-                      },
                     ),
+
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -237,7 +236,10 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
+
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         IconButton(
                           tooltip: "Tema",
@@ -246,16 +248,20 @@ class _HomePageState extends State<HomePage> {
                           onPressed: () {
                             showMenu(
                               context: context,
-                              position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
+                              position:
+                                  const RelativeRect.fromLTRB(1000, 80, 16, 0),
                               items: [
                                 PopupMenuItem(
-                                    onTap: () => setState(() => appTheme = "White"),
+                                    onTap: () =>
+                                        setState(() => appTheme = "White"),
                                     child: const Text("White")),
                                 PopupMenuItem(
-                                    onTap: () => setState(() => appTheme = "Dark"),
+                                    onTap: () =>
+                                        setState(() => appTheme = "Dark"),
                                     child: const Text("Dark")),
                                 PopupMenuItem(
-                                    onTap: () => setState(() => appTheme = "Light"),
+                                    onTap: () =>
+                                        setState(() => appTheme = "Light"),
                                     child: const Text("Light")),
                               ],
                             );
@@ -272,19 +278,24 @@ class _HomePageState extends State<HomePage> {
                           onPressed: () {
                             showMenu(
                               context: context,
-                              position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
+                              position:
+                                  const RelativeRect.fromLTRB(1000, 80, 16, 0),
                               items: [
                                 PopupMenuItem(
-                                    onTap: () => setState(() => uiLanguage = "pt"),
+                                    onTap: () =>
+                                        setState(() => uiLanguage = "pt"),
                                     child: const Text("Português")),
                                 PopupMenuItem(
-                                    onTap: () => setState(() => uiLanguage = "en"),
+                                    onTap: () =>
+                                        setState(() => uiLanguage = "en"),
                                     child: const Text("English")),
                                 PopupMenuItem(
-                                    onTap: () => setState(() => uiLanguage = "es"),
+                                    onTap: () =>
+                                        setState(() => uiLanguage = "es"),
                                     child: const Text("Español")),
                                 PopupMenuItem(
-                                    onTap: () => setState(() => uiLanguage = "fr"),
+                                    onTap: () =>
+                                        setState(() => uiLanguage = "fr"),
                                     child: const Text("Français")),
                               ],
                             );
@@ -296,6 +307,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
@@ -303,6 +315,7 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 20),
+
                     _buildFieldContainer(
                       _buildFieldWithButton(
                         textController,
@@ -330,7 +343,8 @@ class _HomePageState extends State<HomePage> {
                       Row(
                         children: [
                           Expanded(
-                            child: _buildSingleField(questionController, t["question"]!),
+                            child:
+                                _buildSingleField(questionController, t["question"]!),
                           ),
                           const SizedBox(width: 16),
                           ElevatedButton(
@@ -354,13 +368,11 @@ class _HomePageState extends State<HomePage> {
                       width: fieldWidth,
                     ),
                     const SizedBox(height: 16),
-
                     _buildFieldContainer(
                       _buildOutputContainer("${t["answer"]}: $answer"),
                       width: fieldWidth,
                     ),
                     const SizedBox(height: 24),
-
                     _buildFieldContainer(
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -368,7 +380,8 @@ class _HomePageState extends State<HomePage> {
                           Row(
                             children: [
                               Expanded(
-                                child: _buildSingleField(translateController, t["translate"]!),
+                                child:
+                                    _buildSingleField(translateController, t["translate"]!),
                               ),
                               const SizedBox(width: 16),
                               SizedBox(
@@ -383,7 +396,7 @@ class _HomePageState extends State<HomePage> {
                                     return DropdownMenuItem(
                                       value: lang["code"],
                                       child: Text(
-                                        languageNames[uiLanguage]![lang["code"]]!, // <-- usa o uiLanguage
+                                        languageNames[uiLanguage]![lang["code"]]!,
                                         style: TextStyle(color: textColor),
                                       ),
                                     );
@@ -418,17 +431,13 @@ class _HomePageState extends State<HomePage> {
                       ),
                       width: fieldWidth,
                     ),
-
                     const SizedBox(height: 16),
-
-                    // Tradução final
                     _buildFieldContainer(
                       _buildOutputContainer("${t["translated"]}: $translated"),
                       width: fieldWidth,
                     ),
                     const SizedBox(height: 40),
 
-                    // Botões Enviar Tudo e Limpar
                     Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -475,14 +484,11 @@ class _HomePageState extends State<HomePage> {
                           ElevatedButton(
                             onPressed: () {
                               setState(() {
-                                // Limpa todos os campos de texto
                                 textController.clear();
                                 contextController.clear();
                                 questionController.clear();
                                 translateController.clear();
-                                // Reseta o dropdown de idioma
                                 language = "pt-BR";
-                                // Reseta outputs
                                 summary = "";
                                 answer = "";
                                 translated = "";
@@ -511,7 +517,6 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 50),
                   ],
                 ),
@@ -523,7 +528,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // === Widgets auxiliares ===
   Widget _buildFieldWithButton(
       TextEditingController controller, String label, VoidCallback onPressed) {
     return Row(
