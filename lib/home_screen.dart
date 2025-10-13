@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'storage_service.dart';
 import 'main.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,6 +26,7 @@ class _HomePageState extends State<HomePage> {
 
   String loggedUser = "";
   bool apiOnline = false;
+  IO.Socket? socket;
 
   Color get backgroundColor {
     switch (appTheme) {
@@ -59,33 +61,64 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _connectSocket();
     _loadFooterInfo();
   }
 
   Future<void> _loadFooterInfo() async {
-    String? user = await getUserLogin();
-    bool status = await ApiService.checkStatus();
-    setState(() {
-      loggedUser = user ?? "";
-      apiOnline = status;
+  String? user = await getUserLogin();
+  setState(() {
+    loggedUser = user ?? "";
+  });
+}
+
+  void _connectSocket() {
+    socket = IO.io(
+      ApiService.baseUrl,
+      <String, dynamic>{
+        'transports': ['websocket'],
+        'autoConnect': true,
+        'reconnection': true,        
+        'reconnectionAttempts': 5,   
+        'reconnectionDelay': 2000,   
+      },
+    );
+
+    socket!.onConnect((_) {
+      print('Conectado ao WebSocket');
+      setState(() => apiOnline = true);
+    });
+
+    socket!.onDisconnect((_) {
+      print('Desconectado do WebSocket');
+      setState(() => apiOnline = false);
+    });
+
+    socket!.onReconnect((attempt) {
+      print('Tentativa de reconexão #$attempt');
+    });
+
+    socket!.onReconnectError((err) {
+      print('Erro ao reconectar: $err');
+    });
+
+    socket!.on('api_status', (data) {
+      if (!mounted) return;
+      setState(() {
+        apiOnline = data['online'] as bool;
+      });
+    });
+
+    socket!.onConnectError((err) {
+      print('Erro de conexão: $err');
+      setState(() => apiOnline = false);
     });
   }
 
-  InputDecoration _buildInputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(color: textColor),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: textColor),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: textColor, width: 2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      filled: true,
-      fillColor: fieldFillColor,
-    );
+  @override
+  void dispose() {
+    socket?.disconnect();
+    super.dispose();
   }
 
   final Map<String, Map<String, String>> translations = {
@@ -177,6 +210,70 @@ class _HomePageState extends State<HomePage> {
     },
   };
 
+  InputDecoration _buildInputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: textColor),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: textColor),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: textColor, width: 2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      filled: true,
+      fillColor: fieldFillColor,
+    );
+  }
+
+  Widget _buildFieldWithButton(
+      TextEditingController controller, String label, VoidCallback onPressed) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            style: TextStyle(color: textColor),
+            decoration: _buildInputDecoration(label),
+            maxLines: null,
+          ),
+        ),
+        const SizedBox(width: 16),
+        ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            foregroundColor: textColor,
+            backgroundColor:
+                appTheme == "Dark" ? Colors.grey.shade800 : Colors.blueAccent,
+          ),
+          child: Text(translations[uiLanguage]!["send"]!),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSingleField(TextEditingController controller, String label) {
+    return TextField(
+      controller: controller,
+      style: TextStyle(color: textColor),
+      decoration: _buildInputDecoration(label),
+      maxLines: null,
+    );
+  }
+
+  Widget _buildOutputContainer(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: textColor),
+        borderRadius: BorderRadius.circular(5),
+        color: fieldFillColor,
+      ),
+      child: Text(text, style: TextStyle(color: textColor)),
+    );
+  }
+
   Widget _buildFieldContainer(Widget child, {required double width}) {
     return Center(
       child: SizedBox(
@@ -189,7 +286,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final t = translations[uiLanguage]!;
-    final double fieldWidth = MediaQuery.of(context).size.width * 0.60;
+    final double fieldWidth = MediaQuery.of(context).size.width * 0.6;
 
     return Scaffold(
       body: Container(
@@ -208,7 +305,6 @@ class _HomePageState extends State<HomePage> {
             : BoxDecoration(color: backgroundColor),
         child: Column(
           children: [
-            // HEADER
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               height: 140,
@@ -320,7 +416,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            // BODY
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
@@ -439,8 +534,6 @@ class _HomePageState extends State<HomePage> {
                         _buildOutputContainer("${t["translated"]}: $translated"),
                         width: fieldWidth),
                     const SizedBox(height: 40),
-
-                    // BOTÕES SALVAR/LIMPAR
                     Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -528,7 +621,7 @@ class _HomePageState extends State<HomePage> {
               color: appTheme == "Dark" ? Colors.black54 : Colors.blue.shade50,
               child: Center(
                 child: Text(
-                  "🏠 HomeScreen  👤 Usuário: $loggedUser     🔌 API: ${apiOnline ? "Online" : "Offline"}     ⚙️ Backend: v1.0.0",
+                  "🏠 HomeScreen  👤 User: $loggedUser     🔌 API: ${apiOnline ? "Online" : "Offline"}     ⚙️ Backend: v1.0.0",
                   style: TextStyle(
                     color: textColor,
                     fontWeight: FontWeight.bold,
@@ -540,53 +633,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildFieldWithButton(
-      TextEditingController controller, String label, VoidCallback onPressed) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: controller,
-            style: TextStyle(color: textColor),
-            decoration: _buildInputDecoration(label),
-            maxLines: null,
-          ),
-        ),
-        const SizedBox(width: 16),
-        ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            foregroundColor: textColor,
-            backgroundColor:
-                appTheme == "Dark" ? Colors.grey.shade800 : Colors.blueAccent,
-          ),
-          child: Text(translations[uiLanguage]!["send"]!),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSingleField(TextEditingController controller, String label) {
-    return TextField(
-      controller: controller,
-      style: TextStyle(color: textColor),
-      decoration: _buildInputDecoration(label),
-      maxLines: null,
-    );
-  }
-
-  Widget _buildOutputContainer(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-      decoration: BoxDecoration(
-        border: Border.all(color: textColor),
-        borderRadius: BorderRadius.circular(5),
-        color: fieldFillColor,
-      ),
-      child: Text(text, style: TextStyle(color: textColor)),
     );
   }
 }
