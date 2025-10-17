@@ -310,28 +310,52 @@ class _HomePageState extends State<HomePage> {
               height: 140,
               color: Colors.transparent,
               child: SafeArea(
-                child: Row(
+                child: 
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    IconButton(
-                      tooltip: "Sair",
-                      icon: Image.asset(
-                        'assets/signout.png',
-                        width: 32,
-                        height: 32,
-                        color: textColor,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            padding: EdgeInsets.zero,            
+                            constraints: const BoxConstraints(), 
+                            iconSize: 32,
+                            tooltip: "Sair",
+                            icon: Image.asset(
+                              'assets/signout.png',
+                              width: 32,
+                              height: 32,
+                              color: textColor,
+                            ),
+                            onPressed: () async {
+                              await clearToken();
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                                (route) => false,
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 6), 
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            iconSize: 32,
+                            tooltip: "Perfil",
+                            icon: Image.asset(
+                              'assets/user.png',
+                              width: 32,
+                              height: 32,
+                              color: textColor,
+                            ),
+                            onPressed: () {
+                              print("Perfil clicado");
+                            },
+                          ),
+                        ],
                       ),
-                      onPressed: () async {
-                        await clearToken();
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginScreen()),
-                          (route) => false,
-                        );
-                      },
-                    ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

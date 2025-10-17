@@ -60,6 +60,7 @@ flutter:
     - assets/config/appsettings.json
     - assets/makenlp.png
     - assets/login.png
+    - assets/user.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

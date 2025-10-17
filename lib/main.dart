@@ -157,17 +157,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RegistryScreen()),
-                      );
-                    },
-                    child: const Text(
-                      'Criar conta',
-                      style: TextStyle(color: Colors.cyanAccent),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.40,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.cyanAccent.withOpacity(0.1),
+                        side: const BorderSide(color: Colors.cyanAccent),
+                        foregroundColor: Colors.cyanAccent,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const RegistryScreen()),
+                        );
+                      },
+                      child: const Text(
+                        'Criar conta',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
                     ),
                   ),
                 ],
