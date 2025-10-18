@@ -12,6 +12,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey _settingsKey = GlobalKey();
   final TextEditingController textController = TextEditingController();
   final TextEditingController contextController = TextEditingController();
   final TextEditingController questionController = TextEditingController();
@@ -321,12 +322,12 @@ class _HomePageState extends State<HomePage> {
                           IconButton(
                             padding: EdgeInsets.zero,            
                             constraints: const BoxConstraints(), 
-                            iconSize: 32,
+                            iconSize: 38,
                             tooltip: "Sair",
                             icon: Image.asset(
                               'assets/signout.png',
-                              width: 32,
-                              height: 32,
+                              width: 38,
+                              height: 38,
                               color: textColor,
                             ),
                             onPressed: () async {
@@ -340,18 +341,61 @@ class _HomePageState extends State<HomePage> {
                           ),
                           const SizedBox(width: 6), 
                           IconButton(
+                            key: _settingsKey,
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
-                            iconSize: 32,
-                            tooltip: "Perfil",
+                            iconSize: 24,
+                            tooltip: "Settings",
                             icon: Image.asset(
-                              'assets/user.png',
-                              width: 32,
-                              height: 32,
+                              'assets/settings.png',
+                              width: 24,
+                              height: 24,
                               color: textColor,
                             ),
                             onPressed: () {
-                              print("Perfil clicado");
+                              final RenderBox renderBox = _settingsKey.currentContext!.findRenderObject() as RenderBox;
+                              final Offset offset = renderBox.localToGlobal(Offset.zero);
+                              final Size size = renderBox.size;
+
+                              showMenu(
+                                context: context,
+                                position: RelativeRect.fromLTRB(offset.dx, offset.dy + size.height, offset.dx+1, 0),
+                                items : [
+                                  PopupMenuItem(child: Row(
+                                    children: [
+                                      Image.asset('assets/user.png', width: 18, height: 18),
+                                      const SizedBox(width: 10),
+                                      const Text("Perfil"),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    print("Perfil");
+                                  },
+                                  ),
+                                  PopupMenuItem(child: Row(
+                                    children: [
+                                      Image.asset('assets/help.png', width: 18, height: 18),
+                                      const SizedBox(width: 10),
+                                      const Text("Help"),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    print("Help");
+                                  },
+                                  ),
+                                  PopupMenuItem(child: Row(
+                                    children: [
+                                      Image.asset('assets/dev.png', width: 18, height: 18),
+                                      const SizedBox(width: 10),
+                                      const Text("Desenvolvedor"),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    print("Contato");
+                                  },
+                                  ),
+                                ],
+                              );
                             },
                           ),
                         ],
@@ -403,8 +447,8 @@ class _HomePageState extends State<HomePage> {
                           tooltip: "Idioma",
                           icon: Image.asset(
                             'assets/translate.png',
-                            width: 32,
-                            height: 32,
+                            width: 38,
+                            height: 38,
                             color: textColor,
                           ),
                           onPressed: () {
