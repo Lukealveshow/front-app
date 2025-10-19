@@ -15,19 +15,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   void _sendCode() async {
     final result = await ApiService.forgotPassword(_loginController.text);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Código enviado! Verifique seu e-mail.")),
-    );
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ResetPasswordScreen(
-          login: _loginController.text,
-        ),
-      ),
-    );
-  }
+ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(content: Text(result['message'] ?? 'Erro')),
+);
 
+if (result['status'] == 'success') {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ResetPasswordScreen(
+        login: _loginController.text,
+      ),
+    ),
+  );
+}
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
