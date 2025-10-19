@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'api_service.dart';
-import 'main.dart';
+import 'main.dart'; // necessário para LoginScreen
 
 class ResetPasswordScreen extends StatefulWidget {
   final String login;
@@ -42,6 +42,37 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       );
     }
   }
+
+  Widget voltarParaLoginButton(BuildContext context) {
+  return SizedBox(
+    width: MediaQuery.of(context).size.width * 0.40,
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.cyanAccent.withOpacity(0.1), 
+        foregroundColor: Colors.cyanAccent, 
+        side: const BorderSide(color: Colors.cyanAccent), 
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+      ),
+      onPressed: () {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false,
+        );
+      },
+      child: const Text(
+        "Voltar para Login",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.0,
+        ),
+      ),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -176,19 +207,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
-                        (route) => false, 
-                      );
-                    },
-                    child: const Text(
-                      "Voltar para Login",
-                      style: TextStyle(color: Colors.cyanAccent),
-                    ),
-                  ),
+                  voltarParaLoginButton(context), 
                 ],
               ),
             ),

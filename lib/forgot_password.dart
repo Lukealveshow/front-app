@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'reset_password.dart';
 import 'api_service.dart';
+import 'main.dart'; // necessário para LoginScreen
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -15,21 +16,54 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   void _sendCode() async {
     final result = await ApiService.forgotPassword(_loginController.text);
 
-ScaffoldMessenger.of(context).showSnackBar(
-  SnackBar(content: Text(result['message'] ?? 'Erro')),
-);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result['message'] ?? 'Erro')),
+    );
 
-if (result['status'] == 'success') {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => ResetPasswordScreen(
-        login: _loginController.text,
+    if (result['status'] == 'success') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResetPasswordScreen(
+            login: _loginController.text,
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget voltarParaLoginButton(BuildContext context) {
+  return SizedBox(
+    width: MediaQuery.of(context).size.width * 0.40,
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.cyanAccent.withOpacity(0.1), // fundo semitransparente
+        foregroundColor: Colors.cyanAccent, // cor do texto
+        side: const BorderSide(color: Colors.cyanAccent), // borda
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+      ),
+      onPressed: () {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false,
+        );
+      },
+      child: const Text(
+        "Voltar para Login",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.0,
+        ),
       ),
     ),
   );
 }
-  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,13 +141,7 @@ if (result['status'] == 'success') {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      "Voltar para Login",
-                      style: TextStyle(color: Colors.cyanAccent),
-                    ),
-                  ),
+                  voltarParaLoginButton(context), // botão padronizado
                 ],
               ),
             ),
