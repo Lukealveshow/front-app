@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'reset_password_screen.dart';
+import 'reset_password.dart';
 import 'api_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {

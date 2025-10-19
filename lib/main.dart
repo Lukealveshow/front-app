@@ -4,6 +4,8 @@ import 'registry.dart';
 import 'home_screen.dart';
 import 'storage_service.dart';
 import 'services/config_service.dart';
+import 'reset_password.dart';
+import 'forgot_password.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,7 +80,6 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo LOGIN
                   Image.asset(
                     'assets/login.png',
                     height: 150,
@@ -159,19 +160,28 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 12),
                   SizedBox(
                     width: MediaQuery.of(context).size.width*0.40,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> ResetPasswordScreen()),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.cyanAccent.withOpacity(0.1),
+                        foregroundColor: Colors.cyanAccent,
+                        side: const BorderSide(color: Colors.cyanAccent),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
                         );
                       },
-                      child: const Text("Redefinir Senha",
-                      style: TextStyle(
-                        color: Colors.cyanAccent,
-                        fontSize: 14,
-                        decoration: TextDecoration.underline,
-                      ),
-                      ),
+                      child: const Text(
+                        'Redefinir Senha',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
                       ),
                     ),
                   ),
