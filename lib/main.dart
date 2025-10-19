@@ -156,7 +156,26 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width*0.40,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> ResetPasswordScreen()),
+                        );
+                      },
+                      child: const Text("Redefinir Senha",
+                      style: TextStyle(
+                        color: Colors.cyanAccent,
+                        fontSize: 14,
+                        decoration: TextDecoration.underline,
+                      ),
+                      ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.40,
                     child: ElevatedButton(
