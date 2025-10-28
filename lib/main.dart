@@ -53,8 +53,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (result['status'] == 'success') {
-      await saveToken(result['token']);
-      await saveUserLogin(result['login']);
+      await StorageService.saveToken(result['token']);
+      await StorageService.saveUserLogin(result['login']);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),

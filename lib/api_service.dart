@@ -124,6 +124,22 @@ class ApiService {
   return jsonDecode(response.body);
 }
 
+static Future<Map<String, dynamic>> getUserData(String token) async {
+  final url = Uri.parse("$baseUrl/user");
+  final response = await http.get(
+    url,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    return {"status": "error", "message": "Erro ao obter dados do usuário"};
+  }
+}
 
   static Future<bool> checkStatus() async {
   try {

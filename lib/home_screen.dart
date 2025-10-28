@@ -3,6 +3,8 @@ import 'api_service.dart';
 import 'storage_service.dart';
 import 'main.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'services/language_service.dart';
+import 'profile_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -67,11 +69,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadFooterInfo() async {
-  String? user = await getUserLogin();
-  setState(() {
-    loggedUser = user ?? "";
-  });
-}
+    String? user = await StorageService.getUserLogin();
+    setState(() {
+      loggedUser = user ?? "";
+    });
+  }
 
   void _connectSocket() {
     socket = IO.io(
@@ -79,9 +81,9 @@ class _HomePageState extends State<HomePage> {
       <String, dynamic>{
         'transports': ['websocket'],
         'autoConnect': true,
-        'reconnection': true,        
-        'reconnectionAttempts': 5,   
-        'reconnectionDelay': 2000,   
+        'reconnection': true,
+        'reconnectionAttempts': 5,
+        'reconnectionDelay': 2000,
       },
     );
 
@@ -135,6 +137,14 @@ class _HomePageState extends State<HomePage> {
       "answer": "Resposta",
       "translated": "Tradução",
       "clean": "Limpar",
+      "profile": "Perfil",
+      "help": "Ajuda",
+      "developer": "Desenvolvedor",
+      "login": "Login",
+      "email": "E-mail",
+      "password": "Senha",
+      "reset_password": "Redefinir Senha",
+      "home": "Voltar à Home",
     },
     "en": {
       "title": "Welcome to MAKENLP",
@@ -148,6 +158,14 @@ class _HomePageState extends State<HomePage> {
       "answer": "Answer",
       "translated": "Translation",
       "clean": "Clean",
+      "profile": "Profile",
+      "help": "Help",
+      "developer": "Developer",
+      "login": "Login",
+      "email": "Email",
+      "password": "Password",
+      "reset_password": "Reset Password",
+      "home": "Back to Home",
     },
     "es": {
       "title": "Bienvenido a MAKENLP",
@@ -161,6 +179,14 @@ class _HomePageState extends State<HomePage> {
       "answer": "Respuesta",
       "translated": "Traducción",
       "clean": "Limpiar",
+      "profile": "Perfil",
+      "help": "Ayuda",
+      "developer": "Programador",
+      "login": "Usuario",
+      "email": "Correo",
+      "password": "Contraseña",
+      "reset_password": "Restablecer Contraseña",
+      "home": "Volver a Inicio",
     },
     "fr": {
       "title": "Bienvenue à MAKENLP",
@@ -173,7 +199,15 @@ class _HomePageState extends State<HomePage> {
       "summary": "Résumé",
       "answer": "Réponse",
       "translated": "Traduction",
-      "clean": "Effacer"
+      "clean": "Effacer",
+      "profile": "Profil",
+      "help": "Aide",
+      "developer": "Développeur",
+      "login": "Login",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "reset_password": "Réinitialiser le mot de passe",
+      "home": "Retour à l'accueil",
     },
   };
 
@@ -311,95 +345,109 @@ class _HomePageState extends State<HomePage> {
               height: 140,
               color: Colors.transparent,
               child: SafeArea(
-                child: 
-                Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            padding: EdgeInsets.zero,            
-                            constraints: const BoxConstraints(), 
-                            iconSize: 38,
-                            tooltip: "Sair",
-                            icon: Image.asset(
-                              'assets/signout.png',
-                              width: 38,
-                              height: 38,
-                              color: textColor,
-                            ),
-                            onPressed: () async {
-                              await clearToken();
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(builder: (context) => const LoginScreen()),
-                                (route) => false,
-                              );
-                            },
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          iconSize: 38,
+                          tooltip: "Sair",
+                          icon: Image.asset(
+                            'assets/signout.png',
+                            width: 38,
+                            height: 38,
+                            color: textColor,
                           ),
-                          const SizedBox(width: 6), 
-                          IconButton(
-                            key: _settingsKey,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            iconSize: 24,
-                            tooltip: "Settings",
-                            icon: Image.asset(
-                              'assets/settings.png',
-                              width: 24,
-                              height: 24,
-                              color: textColor,
-                            ),
-                            onPressed: () {
-                              final RenderBox renderBox = _settingsKey.currentContext!.findRenderObject() as RenderBox;
-                              final Offset offset = renderBox.localToGlobal(Offset.zero);
-                              final Size size = renderBox.size;
+                          onPressed: () async {
+                            await StorageService.clearToken();
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()),
+                              (route) => false,
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 6),
+                        IconButton(
+                          key: _settingsKey,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          iconSize: 24,
+                          tooltip: "Settings",
+                          icon: Image.asset(
+                            'assets/settings.png',
+                            width: 24,
+                            height: 24,
+                            color: textColor,
+                          ),
+                          onPressed: () {
+                            final RenderBox renderBox =
+                                _settingsKey.currentContext!.findRenderObject()
+                                    as RenderBox;
+                            final Offset offset = renderBox.localToGlobal(Offset.zero);
+                            final Size size = renderBox.size;
 
-                              showMenu(
-                                context: context,
-                                position: RelativeRect.fromLTRB(offset.dx, offset.dy + size.height, offset.dx+1, 0),
-                                items : [
-                                  PopupMenuItem(child: Row(
-                                    children: [
-                                      Image.asset('assets/user.png', width: 18, height: 18),
-                                      const SizedBox(width: 10),
-                                      const Text("Perfil"),
-                                    ],
+                            showMenu(
+                              context: context,
+                              position: RelativeRect.fromLTRB(
+                                  offset.dx, offset.dy + size.height, offset.dx + 1, 0),
+                              items: [
+                                PopupMenuItem(
+                                    child: Row(
+                                      children: [
+                                        Image.asset('assets/user.png', width: 18, height: 18),
+                                        const SizedBox(width: 10),
+                                        Text(t["profile"]!), 
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Future.delayed(Duration.zero, (){
+                                        Navigator.push(context, 
+                                        MaterialPageRoute(builder: 
+                                        (context)=> ProfileScreen(
+                                          appTheme: appTheme, uiLanguage: uiLanguage, translations: translations
+                                        ),
+                                      ),
+                                    );
+                                      });
+                                    },
                                   ),
-                                  onTap: () {
-                                    print("Perfil");
-                                  },
-                                  ),
-                                  PopupMenuItem(child: Row(
+                                PopupMenuItem(
+                                  child: Row(
                                     children: [
                                       Image.asset('assets/help.png', width: 18, height: 18),
                                       const SizedBox(width: 10),
-                                      const Text("Help"),
+                                      Text(t["help"]!), 
                                     ],
                                   ),
                                   onTap: () {
-                                    print("Help");
+                                    print("Ajuda");
                                   },
-                                  ),
-                                  PopupMenuItem(child: Row(
+                                ),
+                                PopupMenuItem(
+                                  child: Row(
                                     children: [
                                       Image.asset('assets/dev.png', width: 18, height: 18),
                                       const SizedBox(width: 10),
-                                      const Text("Desenvolvedor"),
+                                      Text(t["developer"]!),
                                     ],
                                   ),
                                   onTap: () {
-                                    print("Contato");
+                                    print("Desenvolvedor");
                                   },
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ],
-                      ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -483,6 +531,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+
 
             Expanded(
               child: SingleChildScrollView(
@@ -608,7 +657,7 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           ElevatedButton(
                             onPressed: () async {
-                              final token = await getSavedToken();
+                              final token = await StorageService.getSavedToken();
                               final result = await ApiService.saveData(
                                 textController.text,
                                 contextController.text,
