@@ -3,6 +3,7 @@ import 'storage_service.dart';
 import 'main.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
+import 'dev_screen.dart';
 
 class HelpScreen extends StatefulWidget {
   final String appTheme;
@@ -320,7 +321,14 @@ MAKENLP est un logiciel d’Intelligence Artificielle conçu pour simplifier l�
                                     ],
                                   ),
                                   onTap: () {
-                                    print("Desenvolvedor");
+                                    Future.delayed(Duration.zero, (){
+                                      Navigator.push(context,
+                                      MaterialPageRoute(builder:
+                                      (context)=> DevScreen(appTheme: appTheme, uiLanguage: uiLanguage, translations: widget.translations
+                                      ),
+                                    ),
+                                  );
+                                    });
                                   },
                                 ),
                               ],

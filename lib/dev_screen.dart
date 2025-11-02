@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'storage_service.dart';
 import 'main.dart';
 import 'home_screen.dart';
-import 'reset_password.dart';
+import 'profile_screen.dart';
 import 'help_screen.dart';
-import 'dev_screen.dart';
 
-class ProfileScreen extends StatefulWidget {
+class DevScreen extends StatefulWidget {
   final String appTheme;
   final String uiLanguage;
   final Map<String, Map<String, String>> translations;
 
-  const ProfileScreen({
+  const DevScreen({
     super.key,
     required this.appTheme,
     required this.uiLanguage,
@@ -20,23 +19,17 @@ class ProfileScreen extends StatefulWidget {
   });
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<DevScreen> createState() => _DevScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _DevScreenState extends State<DevScreen> {
   final GlobalKey _settingsKey = GlobalKey();
   late String appTheme;
   late String uiLanguage;
   late Map<String, String> t;
 
-  bool _obscurePassword = true;
-  String _realPassword = "";
-
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  final GlobalKey _languageKey = GlobalKey();
+  bool isHoveringLinkedIn = false;
+  bool isHoveringGmail = false;
 
   @override
   void initState() {
@@ -44,37 +37,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
     appTheme = widget.appTheme;
     uiLanguage = widget.uiLanguage;
     t = widget.translations[uiLanguage]!;
-
-    _carregarDadosUsuario();
   }
 
-  Future<void> _carregarDadosUsuario() async {
-    try {
-      final token = await StorageService.getSavedToken();
-      if (token.isEmpty) return;
-
-      final response = await ApiService.getUserData(token);
-      if (response["status"] == "success") {
-        final user = response["user"];
-        setState(() {
-          _nameController.text = user["login"] ?? "";
-          _emailController.text = user["email"] ?? "";
-          _realPassword = user["password"] ?? "";
-          _passwordController.text = "********";
-        });
-      } else {
-        debugPrint("Erro ao buscar usuário: ${response["message"]}");
-      }
-    } catch (e) {
-      debugPrint("Erro ao carregar dados do usuário: $e");
-    }
+  void _changeLanguage(String lang) {
+    setState(() {
+      uiLanguage = lang;
+      t = widget.translations[uiLanguage]!;
+    });
   }
 
-  Color get textColor =>
-      appTheme == "Dark" ? Colors.cyanAccent : Colors.black87;
+  void _showLanguageMenu() {
+    showMenu(
+      context: context,
+      position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
+      items: [
+        PopupMenuItem(
+          child: const Text("Português"),
+          onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("pt")),
+        ),
+        PopupMenuItem(
+          child: const Text("English"),
+          onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("en")),
+        ),
+        PopupMenuItem(
+          child: const Text("Español"),
+          onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("es")),
+        ),
+        PopupMenuItem(
+          child: const Text("Français"),
+          onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("fr")),
+        ),
+      ],
+    );
+  }
 
-  Color get fieldFillColor =>
-      appTheme == "Dark" ? Colors.black.withOpacity(0.25) : Colors.white;
+  Color get textColor => appTheme == "Dark" ? Colors.cyanAccent : Colors.black87;
 
   Color get backgroundColor {
     switch (appTheme) {
@@ -87,60 +84,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  InputDecoration _buildInputDecoration(String label, {Widget? suffixIcon}) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(color: textColor),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: textColor),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: textColor, width: 2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      suffixIcon: suffixIcon,
-      filled: true,
-      fillColor: fieldFillColor,
-    );
+  Future<void> _launchLinkedIn() async {
+    final Uri url = Uri.parse('https://www.linkedin.com/in/lucas-martins-43aa5419b/');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception('Não foi possível abrir o LinkedIn.');
+    }
   }
 
-  void _changeLanguage(String lang) {
-  setState(() {
-    uiLanguage = lang;
-    t = widget.translations[lang] ?? {}; 
-  });
-}
+  Future<void> _launchEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'lucasalvesmartins@gmail.com',
+      query: Uri.encodeFull('subject=Suporte - MAKENLP'),
+    );
+    if (!await launchUrl(emailUri)) {
+      throw Exception('Não foi possível abrir o aplicativo de e-mail.');
+    }
+  }
 
-void _showLanguageMenu() {
-  showMenu(
-    context: context,
-    position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
-    items: [
-      PopupMenuItem(
-        child: const Text("Português"),
-        onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("pt")),
-      ),
-      PopupMenuItem(
-        child: const Text("English"),
-        onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("en")),
-      ),
-      PopupMenuItem(
-        child: const Text("Español"),
-        onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("es")),
-      ),
-      PopupMenuItem(
-        child: const Text("Français"),
-        onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("fr")),
-      ),
-    ],
-  );
-}
+  final Map<String, String> devTextsPt = {
+    "dev_text": '''
+👨‍💻 Desenvolvedor:
+O Desenvolvedor do MAKENLP se chama Lucas Alves Martins, nascido em 17/09/1999.  
+Formado em Engenharia da Computação, atua como Analista de Sistemas, Desenvolvedor de Software e Engenheiro de Inteligência Artificial.
 
+              🌐 Redes Sociais e Contato de Suporte
+'''
+  };
+
+  final Map<String, String> devTextsEn = {
+    "dev_text": '''
+👨‍💻 Developer:
+The Developer of MAKENLP is Lucas Alves Martins, born on September 17, 1999.  
+Graduated in Computer Engineering, he works as a Systems Analyst, Software Developer, and Artificial Intelligence Engineer.
+
+              🌐 Social Media & Support Contact
+'''
+  };
+
+  final Map<String, String> devTextsEs = {
+    "dev_text": '''
+👨‍💻 Desarrollador:
+El Desarrollador de MAKENLP es Lucas Alves Martins, nacido el 17/09/1999.  
+Graduado en Ingeniería Informática, trabaja como Analista de Sistemas, Desarrollador de Software e Ingeniero de Inteligencia Artificial.
+
+              🌐 Redes Sociales y Contacto de Soporte
+'''
+  };
+
+  final Map<String, String> devTextsFr = {
+    "dev_text": '''
+👨‍💻 Développeur :
+Le Développeur de MAKENLP est Lucas Alves Martins, né le 17/09/1999.  
+Diplômé en Génie Informatique, il travaille comme Analyste Systèmes, Développeur Logiciel et Ingénieur en Intelligence Artificielle.
+
+              🌐 Réseaux Sociaux et Contacter l'assistance
+'''
+  };
 
   @override
   Widget build(BuildContext context) {
-    final double fieldWidth = MediaQuery.of(context).size.width * 0.35;
+    final devText = uiLanguage == "pt"
+        ? devTextsPt["dev_text"]
+        : uiLanguage == "en"
+            ? devTextsEn["dev_text"]
+            : uiLanguage == "es"
+                ? devTextsEs["dev_text"]
+                : devTextsFr["dev_text"];
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -326,11 +336,11 @@ void _showLanguageMenu() {
               ),
             ),
 
-            const SizedBox(height: 30),
-            Image.asset('assets/user.png', width: 160, height: 160, color: textColor),
+            const SizedBox(height: 10),
+            Image.asset('assets/dev.jpg', width: 240, height: 240),
             const SizedBox(height: 10),
             Text(
-              t["profile"] ?? "Perfil",
+              t["developer"] ?? "Desenvolvedor",
               style: TextStyle(
                 color: textColor,
                 fontSize: 28,
@@ -340,106 +350,123 @@ void _showLanguageMenu() {
             const SizedBox(height: 40),
 
             Expanded(
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // Nome
-                      SizedBox(
-                        width: fieldWidth,
-                        child: TextField(
-                          controller: _nameController,
-                          readOnly: true,
-                          style: TextStyle(color: textColor),
-                          decoration: _buildInputDecoration(t["login"] ?? "Login"),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Column(
+                  children: [
+                    Text(
+                      devText!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: textColor, fontSize: 16, height: 1.6),
+                    ),
+                    const SizedBox(height: 25),
 
-                      // E-mail
-                      SizedBox(
-                        width: fieldWidth,
-                        child: TextField(
-                          controller: _emailController,
-                          readOnly: true,
-                          style: TextStyle(color: textColor),
-                          decoration: _buildInputDecoration(t["email"] ?? "E-mail"),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Senha
-                      SizedBox(
-                        width: fieldWidth,
-                        child: TextField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          readOnly: true,
-                          style: TextStyle(color: textColor),
-                          decoration: _buildInputDecoration(
-                            t["password"] ?? "Senha",
-                            suffixIcon: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                                    color: textColor,
+                    // Ícones e textos invertidos (texto à esquerda, ícone à direita)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        MouseRegion(
+                          onEnter: (_) => setState(() => isHoveringLinkedIn = true),
+                          onExit: (_) => setState(() => isHoveringLinkedIn = false),
+                          child: GestureDetector(
+                            onTap: _launchLinkedIn,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: isHoveringLinkedIn
+                                    ? Colors.blue.withOpacity(0.1)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    uiLanguage == "pt"
+                                        ? "Rede Social"
+                                        : uiLanguage == "en"
+                                            ? "Social Media"
+                                            : uiLanguage == "es"
+                                                ? "Red Social"
+                                                : "Réseau Social",
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscurePassword = !_obscurePassword;
-                                      _passwordController.text = _obscurePassword
-                                          ? "********"
-                                          : _realPassword;
-                                    });
-                                  },
-                                ),
-                                IconButton(
-                                  tooltip: t["reset_password"] ?? "Redefinir Senha",
-                                  icon: const Icon(Icons.refresh, color: Colors.black),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ResetPasswordScreen(login: _nameController.text),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  Image.asset('assets/linkedin.png', width: 36, height: 36),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 40),
-
-                      // Voltar à Home
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const HomePage()),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                        const SizedBox(width: 40),
+                        MouseRegion(
+                          onEnter: (_) => setState(() => isHoveringGmail = true),
+                          onExit: (_) => setState(() => isHoveringGmail = false),
+                          child: GestureDetector(
+                            onTap: _launchEmail,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: isHoveringGmail
+                                    ? Colors.red.withOpacity(0.1)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    uiLanguage == "pt"
+                                        ? "Contato de Suporte"
+                                        : uiLanguage == "en"
+                                            ? "Support Contact"
+                                            : uiLanguage == "es"
+                                                ? "Contacto de Soporte"
+                                                : "Contact Assistance",
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Image.asset('assets/gmail.png', width: 36, height: 36),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                        child: Text(
-                          t["home"] ?? "Voltar à Home",
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      const SizedBox(height: 50),
-                    ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.only(bottom: 40),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                ),
+                child: Text(
+                  t["home"] ?? "Voltar à Home",
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ),
