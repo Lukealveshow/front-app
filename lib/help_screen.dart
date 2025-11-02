@@ -86,9 +86,9 @@ O MAKENLP é um software de Inteligência Artificial criado para facilitar o uso
 
 💡 **Como usar:**
 1. Na tela principal, você pode:
-   • Resumir textos longos (botão “Texto para Sumarização”);
-   • Fazer perguntas com base em um contexto (botão “Texto para gerar Resposta”);
-   • Traduzir textos para outros idiomas (botão “Tradução Textual”).
+   • Resumir textos (campo “Texto para Sumarização”);
+   • Fazer perguntas com base em um contexto (campo “Texto para gerar Resposta”);
+   • Traduzir textos para outros idiomas (campo “Tradução Textual”).
 
 2. O sistema usa tecnologia de IA para processar seu texto e gerar respostas rápidas e precisas.
 
@@ -113,7 +113,7 @@ MAKENLP is an Artificial Intelligence software designed to make natural language
 
 💡 **How to use:**
 1. On the main screen, you can:
-   • Summarize long texts ("Text for Summarization");
+   • Summarize texts ("Text for Summarization");
    • Ask questions based on a context ("Text for Answer Generation");
    • Translate text into other languages ("Text Translation").
 
@@ -140,7 +140,7 @@ MAKENLP es un software de Inteligencia Artificial creado para facilitar el uso d
 
 💡 **Cómo usar:**
 1. En la pantalla principal puedes:
-   • Resumir textos largos (“Texto para Resumir”);
+   • Resumir textos (“Texto para Resumir”);
    • Hacer preguntas basadas en un contexto (“Texto para generar Respuesta”);
    • Traducir textos a otros idiomas (“Traducción de Texto”).
 
@@ -167,7 +167,7 @@ MAKENLP est un logiciel d’Intelligence Artificielle conçu pour simplifier l�
 
 💡 **Comment utiliser :**
 1. Sur l’écran principal, vous pouvez :
-   • Résumer de longs textes (“Texte à Résumer”) ;
+   • Résumer de textes (“Texte à Résumer”) ;
    • Poser des questions à partir d’un contexte (“Texte pour Générer une Réponse”) ;
    • Traduire du texte dans d’autres langues (“Traduction de Texte”).
 
