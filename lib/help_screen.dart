@@ -381,18 +381,18 @@ MAKENLP est un logiciel d’Intelligence Artificielle conçu pour simplifier l�
               ),
             ),
 
-            const SizedBox(height: 20),
-            Image.asset('assets/help.png', width: 150, height: 150, color: textColor),
             const SizedBox(height: 10),
+            Image.asset('assets/help.png', width: 120, height: 120, color: textColor),
+            const SizedBox(height: 4),
             Text(
               t["help"] ?? "Ajuda",
               style: TextStyle(
                 color: textColor,
-                fontSize: 28,
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 16),
 
             Expanded(
               child: SingleChildScrollView(
