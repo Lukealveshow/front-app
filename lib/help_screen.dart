@@ -88,6 +88,7 @@ O MAKENLP é um software de Inteligência Artificial criado para facilitar o uso
 1. Na tela principal, você pode:
    • Resumir textos (campo “Texto para Sumarização”);
    • Fazer perguntas com base em um contexto (campo “Texto para gerar Resposta”);
+   • Opção para escolher o idioma de destino da tradução, permitindo definir para qual idioma o texto será traduzido;
    • Traduzir textos para outros idiomas (campo “Tradução Textual”).
 
 2. O sistema usa tecnologia de IA para processar seu texto e gerar respostas rápidas e precisas.
@@ -100,7 +101,7 @@ O MAKENLP é um software de Inteligência Artificial criado para facilitar o uso
 - Você pode redefinir sua senha quando quiser na tela de perfil.
 
 ⚙️ **Personalização:**
-- Altere o idioma e o tema da interface usando os ícones no topo da tela.
+🌍 Altere o idioma e o tema da interface usando os ícones no topo das telas.
 
 🧠 O MAKENLP foi feito para ajudar estudantes, pesquisadores e profissionais e usuários de todos os tipos,
    a economizar tempo terem mais facilidade para trabalharem com textos e aprimorar o uso da Inteligência Artificial.
@@ -115,6 +116,7 @@ MAKENLP is an Artificial Intelligence software designed to make natural language
 1. On the main screen, you can:
    • Summarize texts ("Text for Summarization");
    • Ask questions based on a context ("Text for Answer Generation");
+   • Option to select the target translation language, letting you choose which language the text will be translated into.;
    • Translate text into other languages ("Text Translation").
 
 2. The system uses AI technology to process your text and provide quick, accurate results.
@@ -127,7 +129,7 @@ MAKENLP is an Artificial Intelligence software designed to make natural language
 - You can reset your password anytime on the profile screen.
 
 ⚙️ **Customization:**
-- Change the interface language and theme using the icons at the top of the screen.
+🌍 Change the interface language and theme using the icons at the top of the screens.
 
 🧠 MAKENLP was created to help students, researchers, professionals, and users of all kinds,
  save time, work more easily with texts, and enhance their use of Artificial Intelligence.
@@ -142,6 +144,7 @@ MAKENLP es un software de Inteligencia Artificial creado para facilitar el uso d
 1. En la pantalla principal puedes:
    • Resumir textos (“Texto para Resumir”);
    • Hacer preguntas basadas en un contexto (“Texto para generar Respuesta”);
+   • Opción para elegir el idioma de destino de la traducción, indicando a qué idioma se traducirá el texto.;
    • Traducir textos a otros idiomas (“Traducción de Texto”).
 
 2. El sistema utiliza tecnología de IA para procesar tu texto y generar respuestas rápidas y precisas.
@@ -154,7 +157,7 @@ MAKENLP es un software de Inteligencia Artificial creado para facilitar el uso d
 - Puedes restablecer tu contraseña en cualquier momento desde el perfil.
 
 ⚙️ **Personalización:**
-- Cambia el idioma y el tema de la interfaz usando los íconos en la parte superior de la pantalla.
+🌍 Cambia el idioma y el tema de la interfaz usando los íconos en la parte superior de las pantallas.
 
 🧠 MAKENLP fue creado para ayudar a estudiantes, investigadores, profesionales y usuarios de todo tipo,
  a ahorrar tiempo, trabajar con mayor facilidad con textos y mejorar el uso de la Inteligencia Artificial.
@@ -168,7 +171,8 @@ MAKENLP est un logiciel d’Intelligence Artificielle conçu pour simplifier l�
 💡 **Comment utiliser :**
 1. Sur l’écran principal, vous pouvez :
    • Résumer de textes (“Texte à Résumer”) ;
-   • Poser des questions à partir d’un contexte (“Texte pour Générer une Réponse”) ;
+   • Poser des questions à partir d’un contexte (“Texte pour Générer une Réponse”);
+   • Option pour choisir la langue cible de la traduction, afin de définir vers quelle langue le texte sera traduit.;
    • Traduire du texte dans d’autres langues (“Traduction de Texte”).
 
 2. Le système utilise l’IA pour traiter vos textes et générer des réponses rapides et précises.
@@ -181,7 +185,7 @@ MAKENLP est un logiciel d’Intelligence Artificielle conçu pour simplifier l�
 - Vous pouvez réinitialiser votre mot de passe à tout moment sur l’écran de profil.
 
 ⚙️ **Personnalisation :**
-- Changez la langue et le thème de l’interface grâce aux icônes situées en haut de l’écran.
+🌍 Changez la langue et le thème de l’interface grâce aux icônes situées en haut des écrans.
 
 🧠 MAKENLP a été conçu pour aider les étudiants, les chercheurs, les professionnels et les utilisateurs de tous types,
  à gagner du temps, à travailler plus facilement avec les textes et à améliorer leur utilisation de l’intelligence artificielle.
