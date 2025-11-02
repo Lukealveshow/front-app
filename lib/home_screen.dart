@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:makenlp/help_screen.dart';
 import 'api_service.dart';
 import 'storage_service.dart';
 import 'main.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'services/language_service.dart';
 import 'profile_screen.dart';
+import 'help_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -427,7 +429,14 @@ class _HomePageState extends State<HomePage> {
                                     ],
                                   ),
                                   onTap: () {
-                                    print("Ajuda");
+                                    Future.delayed(Duration.zero, (){
+                                      Navigator.push(context,
+                                      MaterialPageRoute(builder:
+                                      (context)=> HelpScreen(appTheme: appTheme, uiLanguage: uiLanguage, translations: translations
+                                      ),
+                                    ),
+                                  );
+                                    });
                                   },
                                 ),
                                 PopupMenuItem(

@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart';
 import 'storage_service.dart';
 import 'main.dart';
 import 'home_screen.dart';
-import 'reset_password.dart';
-import 'help_screen.dart';
+import 'profile_screen.dart';
 
-class ProfileScreen extends StatefulWidget {
+class HelpScreen extends StatefulWidget {
   final String appTheme;
   final String uiLanguage;
   final Map<String, Map<String, String>> translations;
 
-  const ProfileScreen({
+  const HelpScreen({
     super.key,
     required this.appTheme,
     required this.uiLanguage,
@@ -19,23 +17,14 @@ class ProfileScreen extends StatefulWidget {
   });
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<HelpScreen> createState() => _HelpScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _HelpScreenState extends State<HelpScreen> {
   final GlobalKey _settingsKey = GlobalKey();
   late String appTheme;
   late String uiLanguage;
   late Map<String, String> t;
-
-  bool _obscurePassword = true;
-  String _realPassword = "";
-
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  final GlobalKey _languageKey = GlobalKey();
 
   @override
   void initState() {
@@ -43,37 +32,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
     appTheme = widget.appTheme;
     uiLanguage = widget.uiLanguage;
     t = widget.translations[uiLanguage]!;
-
-    _carregarDadosUsuario();
   }
 
-  Future<void> _carregarDadosUsuario() async {
-    try {
-      final token = await StorageService.getSavedToken();
-      if (token.isEmpty) return;
+  void _changeLanguage(String lang) {
+    setState(() {
+      uiLanguage = lang;
+      t = widget.translations[uiLanguage]!;
+    });
+  }
 
-      final response = await ApiService.getUserData(token);
-      if (response["status"] == "success") {
-        final user = response["user"];
-        setState(() {
-          _nameController.text = user["login"] ?? "";
-          _emailController.text = user["email"] ?? "";
-          _realPassword = user["password"] ?? "";
-          _passwordController.text = "********";
-        });
-      } else {
-        debugPrint("Erro ao buscar usuário: ${response["message"]}");
-      }
-    } catch (e) {
-      debugPrint("Erro ao carregar dados do usuário: $e");
-    }
+  void _showLanguageMenu() {
+    showMenu(
+      context: context,
+      position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
+      items: [
+        PopupMenuItem(
+          child: const Text("Português"),
+          onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("pt")),
+        ),
+        PopupMenuItem(
+          child: const Text("English"),
+          onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("en")),
+        ),
+        PopupMenuItem(
+          child: const Text("Español"),
+          onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("es")),
+        ),
+        PopupMenuItem(
+          child: const Text("Français"),
+          onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("fr")),
+        ),
+      ],
+    );
   }
 
   Color get textColor =>
       appTheme == "Dark" ? Colors.cyanAccent : Colors.black87;
-
-  Color get fieldFillColor =>
-      appTheme == "Dark" ? Colors.black.withOpacity(0.25) : Colors.white;
 
   Color get backgroundColor {
     switch (appTheme) {
@@ -86,60 +80,123 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  InputDecoration _buildInputDecoration(String label, {Widget? suffixIcon}) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(color: textColor),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: textColor),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: textColor, width: 2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      suffixIcon: suffixIcon,
-      filled: true,
-      fillColor: fieldFillColor,
-    );
-  }
+  final Map<String, String> helpTextsPt = {
+    "help_text": '''
+O MAKENLP é um software de Inteligência Artificial criado para facilitar o uso de recursos de linguagem natural.
 
-  void _changeLanguage(String lang) {
-  setState(() {
-    uiLanguage = lang;
-    t = widget.translations[lang] ?? {}; 
-  });
-}
+💡 **Como usar:**
+1. Na tela principal, você pode:
+   • Resumir textos longos (botão “Texto para Sumarização”);
+   • Fazer perguntas com base em um contexto (botão “Texto para gerar Resposta”);
+   • Traduzir textos para outros idiomas (botão “Tradução Textual”).
 
-void _showLanguageMenu() {
-  showMenu(
-    context: context,
-    position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
-    items: [
-      PopupMenuItem(
-        child: const Text("Português"),
-        onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("pt")),
-      ),
-      PopupMenuItem(
-        child: const Text("English"),
-        onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("en")),
-      ),
-      PopupMenuItem(
-        child: const Text("Español"),
-        onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("es")),
-      ),
-      PopupMenuItem(
-        child: const Text("Français"),
-        onTap: () => Future.delayed(Duration.zero, () => _changeLanguage("fr")),
-      ),
-    ],
-  );
-}
+2. O sistema usa tecnologia de IA para processar seu texto e gerar respostas rápidas e precisas.
 
+3. Todos os seus dados são associados à sua conta e podem ser salvos automaticamente.
+
+🔐 **Segurança da conta:**
+- É necessário se cadastrar e confirmar o e-mail para usar.
+- Se esquecer sua senha, use “Esqueci minha senha” na tela de login.
+- Você pode redefinir sua senha quando quiser na tela de perfil.
+
+⚙️ **Personalização:**
+- Altere o idioma e o tema da interface usando os ícones no topo da tela.
+
+🧠 O MAKENLP foi feito para ajudar estudantes, pesquisadores e profissionais e usuários de todos os tipos,
+   a economizar tempo terem mais facilidade para trabalharem com textos e aprimorar o uso da Inteligência Artificial.
+'''
+  };
+
+  final Map<String, String> helpTextsEn = {
+    "help_text": '''
+MAKENLP is an Artificial Intelligence software designed to make natural language tools easy to use.
+
+💡 **How to use:**
+1. On the main screen, you can:
+   • Summarize long texts ("Text for Summarization");
+   • Ask questions based on a context ("Text for Answer Generation");
+   • Translate text into other languages ("Text Translation").
+
+2. The system uses AI technology to process your text and provide quick, accurate results.
+
+3. All your data is linked to your account and can be saved automatically.
+
+🔐 **Account security:**
+- You need to register and confirm your email to use the system.
+- If you forget your password, click “Forgot Password” on the login screen.
+- You can reset your password anytime on the profile screen.
+
+⚙️ **Customization:**
+- Change the interface language and theme using the icons at the top of the screen.
+
+🧠 MAKENLP was created to help students, researchers, professionals, and users of all kinds,
+ save time, work more easily with texts, and enhance their use of Artificial Intelligence.
+'''
+  };
+
+  final Map<String, String> helpTextsEs = {
+    "help_text": '''
+MAKENLP es un software de Inteligencia Artificial creado para facilitar el uso de herramientas de lenguaje natural.
+
+💡 **Cómo usar:**
+1. En la pantalla principal puedes:
+   • Resumir textos largos (“Texto para Resumir”);
+   • Hacer preguntas basadas en un contexto (“Texto para generar Respuesta”);
+   • Traducir textos a otros idiomas (“Traducción de Texto”).
+
+2. El sistema utiliza tecnología de IA para procesar tu texto y generar respuestas rápidas y precisas.
+
+3. Todos tus datos están asociados a tu cuenta y pueden guardarse automáticamente.
+
+🔐 **Seguridad de la cuenta:**
+- Es necesario registrarse y confirmar tu correo electrónico.
+- Si olvidas tu contraseña, usa “Olvidé mi contraseña” en la pantalla de inicio de sesión.
+- Puedes restablecer tu contraseña en cualquier momento desde el perfil.
+
+⚙️ **Personalización:**
+- Cambia el idioma y el tema de la interfaz usando los íconos en la parte superior de la pantalla.
+
+🧠 MAKENLP fue creado para ayudar a estudiantes, investigadores, profesionales y usuarios de todo tipo,
+ a ahorrar tiempo, trabajar con mayor facilidad con textos y mejorar el uso de la Inteligencia Artificial.
+'''
+  };
+
+  final Map<String, String> helpTextsFr = {
+    "help_text": '''
+MAKENLP est un logiciel d’Intelligence Artificielle conçu pour simplifier l’utilisation des outils de langage naturel.
+
+💡 **Comment utiliser :**
+1. Sur l’écran principal, vous pouvez :
+   • Résumer de longs textes (“Texte à Résumer”) ;
+   • Poser des questions à partir d’un contexte (“Texte pour Générer une Réponse”) ;
+   • Traduire du texte dans d’autres langues (“Traduction de Texte”).
+
+2. Le système utilise l’IA pour traiter vos textes et générer des réponses rapides et précises.
+
+3. Toutes vos données sont liées à votre compte et peuvent être sauvegardées automatiquement.
+
+🔐 **Sécurité du compte :**
+- Vous devez vous inscrire et confirmer votre e-mail pour utiliser le système.
+- Si vous oubliez votre mot de passe, utilisez “Mot de passe oublié” sur l’écran de connexion.
+- Vous pouvez réinitialiser votre mot de passe à tout moment sur l’écran de profil.
+
+⚙️ **Personnalisation :**
+- Changez la langue et le thème de l’interface grâce aux icônes situées en haut de l’écran.
+
+🧠 MAKENLP a été conçu pour aider les étudiants, les chercheurs, les professionnels et les utilisateurs de tous types,
+ à gagner du temps, à travailler plus facilement avec les textes et à améliorer leur utilisation de l’intelligence artificielle.
+'''
+  };
 
   @override
   Widget build(BuildContext context) {
-    final double fieldWidth = MediaQuery.of(context).size.width * 0.35;
+    final helpText = uiLanguage == "pt"
+        ? helpTextsPt["help_text"]
+        : uiLanguage == "en"
+            ? helpTextsEn["help_text"]
+            : uiLanguage == "es"
+                ? helpTextsEs["help_text"]
+                : helpTextsFr["help_text"];
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -159,6 +216,7 @@ void _showLanguageMenu() {
             : BoxDecoration(color: backgroundColor),
         child: Column(
           children: [
+            // TOPO
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               height: 140,
@@ -246,14 +304,7 @@ void _showLanguageMenu() {
                                     ],
                                   ),
                                   onTap: () {
-                                    Future.delayed(Duration.zero, (){
-                                      Navigator.push(context,
-                                      MaterialPageRoute(builder:
-                                      (context)=> HelpScreen(appTheme: appTheme, uiLanguage: uiLanguage, translations: widget.translations
-                                      ),
-                                    ),
-                                  );
-                                    });
+                                    print("Ajuda");
                                   },
                                 ),
                                 PopupMenuItem(
@@ -326,120 +377,50 @@ void _showLanguageMenu() {
               ),
             ),
 
-            const SizedBox(height: 30),
-            Image.asset('assets/user.png', width: 160, height: 160, color: textColor),
+            const SizedBox(height: 20),
+            Image.asset('assets/help.png', width: 150, height: 150, color: textColor),
             const SizedBox(height: 10),
             Text(
-              t["profile"] ?? "Perfil",
+              t["help"] ?? "Ajuda",
               style: TextStyle(
                 color: textColor,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
 
             Expanded(
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // Nome
-                      SizedBox(
-                        width: fieldWidth,
-                        child: TextField(
-                          controller: _nameController,
-                          readOnly: true,
-                          style: TextStyle(color: textColor),
-                          decoration: _buildInputDecoration(t["login"] ?? "Login"),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Text(
+                  helpText!,
+                  style: TextStyle(color: textColor, fontSize: 16, height: 1.6),
+                ),
+              ),
+            ),
 
-                      // E-mail
-                      SizedBox(
-                        width: fieldWidth,
-                        child: TextField(
-                          controller: _emailController,
-                          readOnly: true,
-                          style: TextStyle(color: textColor),
-                          decoration: _buildInputDecoration(t["email"] ?? "E-mail"),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Senha
-                      SizedBox(
-                        width: fieldWidth,
-                        child: TextField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          readOnly: true,
-                          style: TextStyle(color: textColor),
-                          decoration: _buildInputDecoration(
-                            t["password"] ?? "Senha",
-                            suffixIcon: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                                    color: textColor,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscurePassword = !_obscurePassword;
-                                      _passwordController.text = _obscurePassword
-                                          ? "********"
-                                          : _realPassword;
-                                    });
-                                  },
-                                ),
-                                IconButton(
-                                  tooltip: t["reset_password"] ?? "Redefinir Senha",
-                                  icon: const Icon(Icons.refresh, color: Colors.black),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ResetPasswordScreen(login: _nameController.text),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-
-                      // Voltar à Home
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const HomePage()),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          t["home"] ?? "Voltar à Home",
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      const SizedBox(height: 50),
-                    ],
+            Padding(
+              padding: const EdgeInsets.only(bottom: 40),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 30, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                ),
+                child: Text(
+                  t["home"] ?? "Voltar à Home",
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ),
